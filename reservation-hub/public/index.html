@@ -39,6 +39,9 @@ h2 { font-size: 1.6rem; line-height: 1.2; font-weight: 700; margin-bottom: 12px;
 h3 { font-size: 1.05rem; font-weight: 700; }
 p { margin: 0 0 12px; }
 .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--bistro); margin-bottom: 14px; }
+.cta { display:inline-block; font:600 14px var(--font-body); background: var(--bistro); color: var(--card); padding: 10px 16px; border-radius: 8px; text-decoration: none; }
+.cta.alt { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.cta:focus-visible { outline: 2px solid var(--bistro); outline-offset: 2px; }
 .lede { font-size: 1.2rem; color: var(--muted); margin-top: 18px; max-width: 60ch; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
@@ -135,6 +138,7 @@ html { color-scheme: light; } body { margin: 0; }
       <div class="eyebrow">Hackathon project · restaurant operations</div>
       <h1>Reservation Hub</h1>
       <p class="lede">The restaurant's own live reservation book. Resy is one feed and the website is another. If Resy goes down at 5pm, the host keeps seating guests, taking bookings and confirming tables.</p>
+      <p style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap"><a class="cta" href="/app.html">Open the live dashboard</a><a class="cta alt" href="/book.html">Guest booking page</a></p>
     </div>
     <div class="ticket" aria-label="Example outage summary">
       <div class="head">Resy down · 5:30 PM · Wed Oct 7</div>
@@ -206,7 +210,7 @@ html { color-scheme: light; } body { margin: 0; }
   <section>
     <div class="eyebrow">Try it</div>
     <h2>The host stand, step by step</h2>
-    <p class="col muted">This replays the prototype's demo with its sample data. Click through the night.</p>
+    <p class="col muted">This replays the night with sample data. For the full prototype with the floor grid, texting and the guest booking page, <a href="/app.html" style="color:var(--bistro);font-weight:600">open the live host dashboard</a>.</p>
     <div class="demo" style="margin-top:16px">
       <div class="demo-bar">
         <div class="steps" id="steps" role="group" aria-label="Demo steps"></div>

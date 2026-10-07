@@ -2,9 +2,19 @@
 
 One live reservation book for a restaurant that takes bookings on **Resy and its own website**, built to keep service running when Resy goes down.
 
-## Live site
+## Live site (Vercel)
 
-`index.html` at the top of this repo is the pitch page with the clickable host-stand demo (`public/index.html` is a copy). It's plain static HTML, so it deploys on Vercel with no build step. The Python prototype lives in `prototype/`, away from the top level on purpose: it stores data in local files and runs a long-lived server, so it runs on your laptop or a normal server host. If it sits at the top level, Vercel mistakes the repo for a Python app and serves a broken dashboard instead of the page.
+`public/` is a static site with no build step:
+
+| Page | What it is |
+|---|---|
+| `/` | The pitch page: why, how it works, the outage-night timeline |
+| `/app.html` | **Interactive host dashboard.** The same UI as the Python prototype, with the stage buttons, floor grid, texting and replies. It runs entirely in the browser (`public/web/static-api.js` replaces the Python API) with the sample data. |
+| `/book.html` | Guest booking page, sharing one book with the dashboard |
+
+The Python prototype in `prototype/` stores data in local files and runs a long-lived server, so it runs on your laptop or a normal server host, not on Vercel. It stays out of the top level on purpose: if `app.py` sits there, Vercel mistakes the repo for a Python app.
+
+Vercel's project root is the nested `reservation-hub/` folder (from the first upload), so keep it in step with `public/` by running `./sync_static.sh` after editing anything in `public/`.
 
 ## Run the prototype
 
