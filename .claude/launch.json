@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "reservation-hub",
-      "runtimeExecutable": "/Users/germanmunoz/Desktop/reservation-hub/.venv/bin/python",
-      "runtimeArgs": ["-u", "/Users/germanmunoz/Desktop/reservation-hub/app.py"],
+      "runtimeExecutable": "/Users/germanmunoz/Desktop/reservation-hub/prototype/.venv/bin/python",
+      "runtimeArgs": ["-u", "/Users/germanmunoz/Desktop/reservation-hub/prototype/app.py"],
       "port": 8790
     }
   ]

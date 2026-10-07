@@ -4,11 +4,12 @@ One live reservation book for a restaurant that takes bookings on **Resy and its
 
 ## Live site
 
-`public/index.html` is the pitch page with the clickable host-stand demo. It's plain static HTML, so it deploys on Vercel with no build step (`vercel.json` points at `public/`). The Python prototype below stores data in local files and runs a long-lived server, so it runs on your laptop or a normal server host, not on Vercel's serverless functions.
+`index.html` at the top of this repo is the pitch page with the clickable host-stand demo (`public/index.html` is a copy). It's plain static HTML, so it deploys on Vercel with no build step. The Python prototype lives in `prototype/`, away from the top level on purpose: it stores data in local files and runs a long-lived server, so it runs on your laptop or a normal server host. If it sits at the top level, Vercel mistakes the repo for a Python app and serves a broken dashboard instead of the page.
 
 ## Run the prototype
 
 ```bash
+cd prototype
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python app.py
 ```
@@ -27,7 +28,7 @@ Use the **Pitch demo** buttons to replay the story:
 | Text guests to confirm | Confirmation texts are queued (dry run). "Simulate reply" sends a YES or NO back in. |
 | 4 · Resy back | Outage mode ends. |
 
-`./demo.sh` runs the same story in the terminal.
+`./demo.sh` (inside `prototype/`) runs the same story in the terminal.
 
 ## How it works
 

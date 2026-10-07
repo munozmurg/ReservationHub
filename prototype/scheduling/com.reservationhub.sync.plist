@@ -8,14 +8,14 @@
   <key>Label</key><string>com.reservationhub.sync</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/germanmunoz/Desktop/reservation-hub/.venv/bin/python</string>
-    <string>/Users/germanmunoz/Desktop/reservation-hub/pipeline.py</string>
+    <string>/Users/germanmunoz/Desktop/reservation-hub/prototype/.venv/bin/python</string>
+    <string>/Users/germanmunoz/Desktop/reservation-hub/prototype/pipeline.py</string>
     <string>sync</string>
   </array>
   <key>WorkingDirectory</key><string>/Users/germanmunoz/Desktop/reservation-hub</string>
   <key>StartInterval</key><integer>900</integer>
   <key>RunAtLoad</key><true/>
-  <key>StandardOutPath</key><string>/Users/germanmunoz/Desktop/reservation-hub/sync.log</string>
-  <key>StandardErrorPath</key><string>/Users/germanmunoz/Desktop/reservation-hub/sync.log</string>
+  <key>StandardOutPath</key><string>/Users/germanmunoz/Desktop/reservation-hub/prototype/sync.log</string>
+  <key>StandardErrorPath</key><string>/Users/germanmunoz/Desktop/reservation-hub/prototype/sync.log</string>
 </dict>
 </plist>
