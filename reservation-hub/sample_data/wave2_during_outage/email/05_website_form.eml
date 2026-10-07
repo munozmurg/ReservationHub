@@ -1,0 +1,15 @@
+From: Website Forms <forms@casademo.example>
+To: host@casademo.example
+Subject: New website reservation request
+Date: Wed, 07 Oct 2026 17:45:00 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Request ID: W-2003
+Name: Sky Martin
+Phone: 347-555-0199
+Email: sky.m@example.com
+Party: 2
+Date: 2026-10-07
+Time: 9:15 PM
+Message: First time visiting!
