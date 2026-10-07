@@ -2,6 +2,10 @@
 
 One live reservation book for a restaurant that takes bookings on **Resy and its own website**, built to keep service running when Resy goes down.
 
+## Live site
+
+`public/index.html` is the pitch page with the clickable host-stand demo. It's plain static HTML, so it deploys on Vercel with no build step (`vercel.json` points at `public/`). The Python prototype below stores data in local files and runs a long-lived server, so it runs on your laptop or a normal server host, not on Vercel's serverless functions.
+
 ## Run the prototype
 
 ```bash
