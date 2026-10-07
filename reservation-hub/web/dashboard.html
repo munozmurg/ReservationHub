@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Host Dashboard</title>
+<link rel="stylesheet" href="/web/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 id="title">Reservation Hub</h1>
+      <div class="muted" id="subtitle">One reservation book: Resy + website + email + SMS</div>
+    </div>
+    <div class="pills" id="pills"></div>
+  </header>
+
+  <div class="demo">
+    <span class="label">Pitch demo</span>
+    <button data-step="reset">↺ Reset</button>
+    <button data-step="snapshot">1 · 4pm Resy export lands</button>
+    <button data-step="outage">2 · Resy goes down</button>
+    <button data-step="emails">3 · Booking emails arrive</button>
+    <button data-step="recovered">4 · Resy back</button>
+    <a class="btn" href="/book" target="_blank">Open guest booking page ↗</a>
+  </div>
+
+  <div id="banner"></div>
+  <div id="content"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let S = null;
+const fmtPhone = (p) => { const d = String(p || "").replace(/\D/g, "").slice(-10); return d.length === 10 ? `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}` : p; };
+
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+async function post(path, body = {}) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (j.error) toast("⚠ " + j.error); else if (j.message) toast(j.message);
+  await load();
+  return j;
+}
+
+async function load() {
+  S = await (await fetch("/api/state")).json();
+  render();
+}
+
+function pills() {
+  const p = [];
+  p.push(`<span class="pill">Service ${esc(S.service_date)} · clock ${esc(S.clock)}</span>`);
+  p.push(S.last_sync ? `<span class="pill ok">● Synced ${esc(S.last_sync)}</span>` : `<span class="pill">Not synced yet</span>`);
+  p.push(S.outage ? `<span class="pill bad">Resy: DOWN</span>` : `<span class="pill ok">Resy: up</span>`);
+  return p.join("");
+}
+
+function banner() {
+  if (!S.has_data) return "";
+  if (S.outage) return `<div class="banner bad"><span>⚠ OUTAGE MODE: running service from the hub. ${S.grid.buffer_tables} tables held back as buffer · website bookings flagged to re-enter in Resy.</span><button class="danger" onclick="post('/api/outage',{on:false})">Resy is back, end outage</button></div>`;
+  const cls = S.preshift.ok ? "ok" : "warn";
+  return `<div class="banner ${cls}"><span>${esc(S.preshift.message)}</span><button onclick="post('/api/outage',{on:true})">Resy is down, start outage mode</button></div>`;
+}
+
+function runSheet() {
+  const rows = S.run_sheet.map((r) => `
+    <tr>
+      <td><b>${esc(r.time)}</b></td>
+      <td class="nw">${esc(r.guest_name)}${r.needs_review ? ` <span class="flag">⚑</span>` : ""}</td>
+      <td>${esc(r.party_size)}</td>
+      <td><span class="src ${esc(r.booked_via)}">${esc(r.booked_via)}</span></td>
+      <td class="muted nw">${esc(r.external_id)}</td>
+      <td>${esc(r.table_id || "—")}</td>
+      <td class="nw">${r.phone ? esc(fmtPhone(r.phone)) : `<span class="flag">no phone</span>`}</td>
+      <td><span class="chip ${esc(r.guest_confirmation)}">${esc(r.guest_confirmation)}</span></td>
+      <td class="muted">${esc(r.notes || "")}</td>
+    </tr>`).join("");
+  const covers = S.run_sheet.reduce((a, r) => a + (r.party_size || 0), 0);
+  const cancelled = S.cancelled.length
+    ? `<div class="muted" style="margin-top:8px">Cancelled tonight: ${S.cancelled.map((c) => `<s>${esc(c.time)} ${esc(c.guest_name)} (${esc(c.party_size)})</s>`).join(", ")}</div>` : "";
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <h2 style="margin:0">Tonight's run sheet <span class="muted">· ${S.run_sheet.length} bookings · ${covers} covers</span></h2>
+      <button class="primary" onclick="post('/api/confirm')">Text guests to confirm</button>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Time</th><th>Guest</th><th>Pax</th><th>Source</th><th>Conf #</th><th>Table</th><th>Phone</th><th>Confirmed</th><th>Notes</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="9" class="empty">No bookings</td></tr>`}</tbody>
+    </table></div>${cancelled}
+  </div>`;
+}
+
+function sidePanel() {
+  const review = S.review.map((r) => `<li><b>${esc(r.guest_name || "Unknown")}</b> <span class="src ${esc(r.booked_via)}">${esc(r.booked_via)}</span><br><span class="muted">${esc(r.review_reason)}</span></li>`).join("");
+  const dups = S.duplicates.map((d) => `<li><b>${esc(d.guest_name)}</b>: ${esc(d.via_a)} ${esc(d.time_a)} and ${esc(d.via_b)} ${esc(d.time_b)}<br><span class="muted">Same phone/email, same night. Call to keep one.</span></li>`).join("");
+  return `<div style="display:grid;gap:14px">
+    <div class="card"><h2>Needs a human ⚑ <span class="muted">(${S.review.length})</span></h2><ul class="list">${review || `<li class="empty">All clear</li>`}</ul></div>
+    <div class="card"><h2>Possible double bookings <span class="muted">(${S.duplicates.length})</span></h2><ul class="list">${dups || `<li class="empty">None</li>`}</ul></div>
+  </div>`;
+}
+
+function floor() {
+  const g = S.grid, slots = g.slots, n = slots.length;
+  const idx = (t) => { const i = slots.indexOf(t); return i === -1 ? (t < slots[0] ? 0 : n) : i; };
+  let html = `<div class="floor-grid" style="grid-template-columns:56px repeat(${n}, minmax(34px,1fr))">`;
+  html += `<div class="h"></div>` + slots.map((s, i) => `<div class="h">${i % 2 === 0 ? esc(s) : ""}</div>`).join("");
+  g.tables.forEach((t, row) => {
+    const r = row + 2;
+    html += `<div class="t" style="grid-row:${r};grid-column:1">${esc(t.table_id)} <span class="muted">·${t.seats}</span></div>`;
+    for (let i = 0; i < n; i++) html += `<div class="c" style="grid-row:${r};grid-column:${i + 2}"></div>`;
+    t.bookings.forEach((b) => {
+      const a = idx(b.start), e = Math.min(idx(b.end), n);
+      if (e > a) html += `<div class="bk" title="${esc(b.guest)} ${esc(b.start)}–${esc(b.end)}" style="grid-row:${r};grid-column:${a + 2} / ${e + 2}">${esc(b.guest)}</div>`;
+    });
+  });
+  html += `</div>`;
+  const unplaced = g.unplaced.map((u) => `<div class="flag">⚠ Overbooked: ${esc(u.guest)} (${esc(u.party)}) at ${esc(u.time)} doesn't fit any free table</div>`).join("");
+  return `<div class="card" style="margin-bottom:14px">
+    <h2>Floor & availability <span class="muted">· our own grid, not Resy's</span></h2>
+    <div class="floor">${html}</div>${unplaced}
+    <div class="legend"><span><i style="background:var(--busy)"></i>Seated / booked (incl. turn time)</span><span><i style="background:var(--surface-2)"></i>Free</span>
+    ${S.outage ? `<span><b>${g.buffer_tables} tables held back</b> at every slot while Resy is down</span>` : ""}</div>
+    <form class="inline" onsubmit="checkAvail(event)">
+      <select id="qparty">${[1,2,3,4,5,6,7,8].map((p) => `<option ${p === 2 ? "selected" : ""}>${p}</option>`).join("")}</select>
+      <select id="qtime">${slots.map((s) => `<option ${s === "19:30" ? "selected" : ""}>${s}</option>`).join("")}</select>
+      <button>Check availability</button><span id="qres" class="muted" style="align-self:center"></span>
+    </form>
+  </div>`;
+}
+
+function outreach() {
+  const o = S.outreach;
+  const li = (a) => a.map((x) => `<li>${esc(x)}</li>`).join("") || `<li class="empty">None</li>`;
+  return `<div class="grid-3">
+    <div class="card"><h2>📱 Text (${o.text.length})</h2><ul class="list">${li(o.text)}</ul>
+      <form class="inline" onsubmit="simReply(event)"><input id="rphone" placeholder="Guest phone" value="917-555-0123" style="flex:1"><input id="rbody" value="YES" style="width:70px"><button>Simulate reply</button></form></div>
+    <div class="card"><h2>✉️ Email only (${o.email_only.length})</h2><ul class="list">${li(o.email_only)}</ul>
+      <h2 style="margin-top:14px">🚫 Unreachable (${o.unreachable.length})</h2><ul class="list">${li(o.unreachable)}</ul>
+      <p class="muted" style="margin:8px 0 0">Covered by public notices + buffer tables. Honor their Resy confirmation at the door.</p></div>
+    <div class="card"><h2>📣 Public notices</h2>${S.notices ? `<pre class="notice">${esc(S.notices)}</pre>` : `<p class="empty">Generated when outage mode starts.</p>`}</div>
+  </div>`;
+}
+
+function render() {
+  $("#title").textContent = S.restaurant + " · Reservation Hub";
+  $("#pills").innerHTML = pills();
+  $("#banner").innerHTML = banner();
+  if (!S.has_data) {
+    $("#content").innerHTML = `<div class="card empty-state"><h2>No reservations in the hub yet</h2><p class="muted">Click <b>1 · 4pm Resy export lands</b> to load this afternoon's Resy export and website bookings.</p></div>`;
+    return;
+  }
+  $("#content").innerHTML = `<div class="grid-2">${runSheet()}${sidePanel()}</div>${floor()}${outreach()}`;
+}
+
+async function checkAvail(e) {
+  e.preventDefault();
+  const r = await (await fetch("/api/availability", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ party: $("#qparty").value, time: $("#qtime").value }) })).json();
+  $("#qres").innerHTML = r.available ? `<span style="color:var(--ok);font-weight:700">✓ Available</span>`
+    : `<span style="color:var(--bad);font-weight:700">✗ ${esc(r.reason)}</span>${r.alternatives.length ? ` · try ${r.alternatives.map(esc).join(", ")}` : ""}`;
+}
+
+function simReply(e) { e.preventDefault(); post("/api/reply", { phone: $("#rphone").value, body: $("#rbody").value }); }
+
+document.querySelectorAll("[data-step]").forEach((b) => b.addEventListener("click", async () => {
+  b.disabled = true; await post("/api/demo", { step: b.dataset.step }); b.disabled = false;
+}));
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>

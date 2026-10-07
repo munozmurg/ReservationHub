@@ -1,0 +1,4 @@
+# Linux/server alternative: every 15 minutes. Install with `crontab -e`.
+*/15 * * * * cd /path/to/reservation-hub && .venv/bin/python pipeline.py sync >> sync.log 2>&1
+# Heartbeat: every 5 min, warn if the last good sync is older than 20 min.
+*/5 * * * * cd /path/to/reservation-hub && .venv/bin/python pipeline.py status | grep -q STALE && echo "Reservation sync is stale" | mail -s "ALERT reservation-hub" you@example.com

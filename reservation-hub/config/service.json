@@ -1,0 +1,10 @@
+{
+  "restaurant_name": "Casa Demo",
+  "service_start": "17:00",
+  "last_seating": "21:30",
+  "slot_minutes": 15,
+  "turn_minutes": {"2": 90, "4": 105, "6": 120, "8": 135},
+  "snapshot_max_age_minutes": 60,
+  "outage_buffer_pct": 0.2,
+  "public_phone": "(212) 555-0100"
+}

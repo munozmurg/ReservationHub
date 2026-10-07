@@ -1,0 +1,17 @@
+From: Resy <notifications@resy.com>
+To: host@casademo.example
+Subject: New Reservation: Jordan Lee, party of 4
+Date: Wed, 07 Oct 2026 17:12:00 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+You have a new reservation.
+
+Confirmation: RSY-10458
+Guest: Jordan Lee
+Phone: (212) 555-0142
+Email: jordan.lee@example.com
+Party Size: 4
+Date: 2026-10-07
+Time: 8:00 PM
+Notes: Anniversary
