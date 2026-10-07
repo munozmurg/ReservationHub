@@ -1,0 +1,11 @@
+.venv/
+landing/
+lakehouse/
+exports/
+outbox/
+.sync.lock
+.gmail_state
+.env
+__pycache__/
+.DS_Store
+sync.log

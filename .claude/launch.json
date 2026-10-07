@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "reservation-hub",
+      "runtimeExecutable": "/Users/germanmunoz/Desktop/reservation-hub/.venv/bin/python",
+      "runtimeArgs": ["-u", "/Users/germanmunoz/Desktop/reservation-hub/app.py"],
+      "port": 8790
+    }
+  ]
+}
